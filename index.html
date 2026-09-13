@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>หารบิล / ใบเสร็จรับเงิน</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#1e293b">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: 'Sarabun', 'Segoe UI', sans-serif;
+    background: #f1f5f9;
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .card {
+    background: #fff;
+    border-radius: 20px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    max-width: 480px;
+    width: 100%;
+    padding: 24px;
+    margin-bottom: 24px;
+  }
+  h2 { text-align:center; color:#1e3a8a; }
+  .row { display:flex; gap:8px; margin-bottom:10px; align-items:center; }
+  .row input { flex:1; padding:10px; border:1px solid #cbd5e1; border-radius:10px; font-size:15px; }
+  .row input.name { flex:2; }
+  .remove-btn { background:#fee2e2; color:#dc2626; border:none; border-radius:10px; width:38px; height:38px; font-size:16px; cursor:pointer; }
+  .add-btn {
+    width:100%; padding:12px; border:2px dashed #93c5fd; background:#eff6ff;
+    color:#2563eb; border-radius:12px; font-weight:bold; cursor:pointer; margin:10px 0;
+  }
+  label { font-weight:600; display:block; margin:10px 0 6px; }
+  input[type=number] { width:100%; padding:10px; border:1px solid #cbd5e1; border-radius:10px; font-size:15px; }
+  .submit-btn {
+    width:100%; padding:14px; background:#2563eb; color:#fff; border:none;
+    border-radius:12px; font-size:16px; font-weight:bold; cursor:pointer; margin-top:16px;
+  }
+  .submit-btn:active { background:#1d4ed8; }
+  #receipt {
+    background:#fff; border-radius:20px; border:2px solid #dbeafe;
+    max-width:420px; width:100%; padding:30px 24px; text-align:center; display:none;
+  }
+  #receipt .logo {
+    width:70px; height:70px; background:#1e293b; border-radius:50%;
+    display:flex; align-items:center; justify-content:center; margin:0 auto 14px;
+    font-size:30px; color:#facc15;
+  }
+  #receipt h3 { margin:4px 0; color:#0f172a; }
+  #receipt .sub { color:#64748b; font-size:14px; margin:2px 0; }
+  hr { border:none; border-top:1px solid #e2e8f0; margin:16px 0; }
+  #receipt .title { color:#2563eb; font-weight:bold; font-size:17px; }
+  #receipt .code { color:#334155; margin-top:4px; }
+  .meta-row { display:flex; justify-content:space-between; font-size:14px; color:#334155; margin:4px 0; text-align:left; }
+  .item-header { display:flex; justify-content:space-between; font-weight:bold; color:#334155; margin-top:10px; }
+  .item-row { display:flex; justify-content:space-between; margin:8px 0; font-size:15px; }
+  .item-row .name { text-align:left; }
+  .item-row .price { font-weight:bold; }
+  .total-row { display:flex; justify-content:space-between; font-size:15px; margin:6px 0; }
+  .grand-total { display:flex; justify-content:space-between; font-size:20px; font-weight:bold; margin:10px 0; }
+  .split-box {
+    background:#ecfdf5; border:2px dashed #6ee7b7; border-radius:14px;
+    padding:16px; margin-top:16px; display:flex; justify-content:space-between; align-items:center;
+  }
+  .split-box .label { text-align:left; font-weight:bold; color:#065f46; }
+  .split-box .sub { color:#059669; font-size:12px; }
+  .split-box .amount { color:#059669; font-size:26px; font-weight:bold; }
+  .action-btns { display:flex; gap:10px; margin-top:16px; max-width:420px; width:100%; }
+  .action-btns button {
+    flex:1; padding:12px; border-radius:12px; border:none; font-weight:bold; cursor:pointer;
+  }
+  #saveImgBtn { background:#0f172a; color:#fff; }
+  #newBillBtn { background:#e2e8f0; color:#1e293b; }
+</style>
+</head>
+<body>
+
+<div class="card" id="formCard">
+  <h2>📄 ออกใบเสร็จรับเงิน / หารบิล</h2>
+  <label>รายการที่ต้องคิดเงิน / หาร</label>
+  <div id="itemsContainer"></div>
+  <button class="add-btn" onclick="addItem()">+ เพิ่มรายการถัดไป</button>
+
+  <label>จำนวนคนที่หาร (คน)</label>
+  <input type="number" id="peopleCount" value="1" min="1">
+
+  <button class="submit-btn" onclick="generateReceipt()">⚡ สร้างใบกำกับย่อ / ใบเสร็จ</button>
+</div>
+<div id="receipt">
+<div class="logo"><img src="1.png" alt="Logo"></div>
+  <h3>ร้านค้า &amp; บริการอาหาร</h3>
+  <div class="sub">(สำนักงานใหญ่)</div>
+  <div class="sub">สาขาหลัก • กรุงเทพมหานคร</div>
+  <div class="sub">โทร. 02-000-0000</div>
+  <hr>
+  <div class="title">ใบกำกับภาษีอย่างย่อ/ใบเสร็จรับเงิน</div>
+  <div class="code" id="billCode"></div>
+  <hr style="border-style:dashed">
+  <div class="meta-row"><span>พนักงานขาย</span><span>ระบบแคชเชียร์ POS</span></div>
+  <div class="meta-row"><span>วันที่</span><span id="billDate"></span></div>
+  <div class="item-header"><span>รายการ</span><span>รวมเงิน</span></div>
+  <div id="itemsList"></div>
+  <hr>
+  <div class="total-row"><span>จำนวนรวม</span><span id="totalCount"></span></div>
+  <div class="total-row"><span>รวมเป็นเงิน</span><span id="totalSum"></span></div>
+  <div class="grand-total"><span>ยอดสุทธิ</span><span id="grandTotal"></span></div>
+  <div class="split-box">
+    <div>
+      <div class="label" id="splitLabel">จ่ายเฉลี่ย</div>
+      <div class="sub">(ยอดสุทธิ / จำนวนคน)</div>
+    </div>
+    <div class="amount" id="splitAmount"></div>
+  </div>
+</div>
+
+<div class="action-btns" id="actionBtns" style="display:none">
+  <button id="saveImgBtn" onclick="saveAsImage()">💾 บันทึกเป็นรูปภาพ</button>
+  <button id="newBillBtn" onclick="location.reload()">🆕 บิลใหม่</button>
+</div>
+
+<script>
+const SHEET_API_URL = "https://script.google.com/macros/s/AKfycbzBBm-upwM2lnIbqW5tIQwnkUCSLk89if_MpV6lJ_pBwL0ciagR11LPnDVdGOhFCPnD7g/exec";
+
+let itemCount = 0;
+function addItem() {
+  itemCount++;
+  const container = document.getElementById('itemsContainer');
+  const row = document.createElement('div');
+  row.className = 'row';
+  row.innerHTML = `
+    <input type="text" class="name" placeholder="ชื่อรายการ (เช่น ข้าวผัด)">
+    <input type="number" class="price" placeholder="ราคารวม">
+    <button class="remove-btn" onclick="this.parentElement.remove()">✕</button>
+  `;
+  container.appendChild(row);
+}
+addItem();
+
+function generateReceipt() {
+  const names = document.querySelectorAll('#itemsContainer .name');
+  const prices = document.querySelectorAll('#itemsContainer .price');
+  const people = parseInt(document.getElementById('peopleCount').value) || 1;
+
+  let items = [];
+  let total = 0;
+  for (let i = 0; i < names.length; i++) {
+    const name = names[i].value.trim();
+    const price = parseFloat(prices[i].value) || 0;
+    if (name && price > 0) {
+      items.push({ name, price });
+      total += price;
+    }
+  }
+  if (items.length === 0) { alert('กรุณาใส่รายการอย่างน้อย 1 รายการ'); return; }
+
+  const now = new Date();
+  const dateStr = now.toLocaleDateString('th-TH', {day:'2-digit',month:'2-digit',year:'numeric'}) + ' ' +
+                  now.toLocaleTimeString('th-TH', {hour:'2-digit',minute:'2-digit'});
+  const billCode = 'CA' + now.getFullYear() + String(now.getMonth()+1).padStart(2,'0') +
+                    String(now.getDate()).padStart(2,'0') + '-' +
+                    String(now.getHours()).padStart(2,'0') + String(now.getMinutes()).padStart(2,'0');
+
+  document.getElementById('billCode').textContent = billCode;
+  document.getElementById('billDate').textContent = dateStr;
+
+  const itemsList = document.getElementById('itemsList');
+  itemsList.innerHTML = '';
+  items.forEach(it => {
+    const row = document.createElement('div');
+    row.className = 'item-row';
+    row.innerHTML = `<span class="name">${it.name}</span><span class="price">${it.price.toLocaleString('th-TH',{minimumFractionDigits:2})}</span>`;
+    itemsList.appendChild(row);
+  });
+
+  document.getElementById('totalCount').textContent = items.length;
+  document.getElementById('totalSum').textContent = total.toLocaleString('th-TH',{minimumFractionDigits:2});
+  document.getElementById('grandTotal').textContent = total.toLocaleString('th-TH',{minimumFractionDigits:2}) + ' บาท';
+  document.getElementById('splitLabel').textContent = `จ่ายเฉลี่ย (${people} คน)`;
+  document.getElementById('splitAmount').textContent = (total/people).toLocaleString('th-TH',{minimumFractionDigits:2}) + ' บ.';
+
+  document.getElementById('formCard').style.display = 'none';
+  document.getElementById('receipt').style.display = 'block';
+  document.getElementById('actionBtns').style.display = 'flex';
+
+  saveToSheet({ billCode, date: dateStr, items, total, people, perPerson: total/people });
+}
+
+function saveToSheet(data) {
+  fetch(SHEET_API_URL, {
+    method: 'POST',
+    mode: 'no-cors',
+    headers: { 'Content-Type': 'text/plain' },
+    body: JSON.stringify(data)
+  }).catch(err => console.log('บันทึกลง Sheet ไม่สำเร็จ', err));
+}
+
+function saveAsImage() {
+  const receipt = document.getElementById('receipt');
+  html2canvas(receipt, { scale: 2, backgroundColor: '#ffffff' }).then(canvas => {
+    const link = document.createElement('a');
+    link.download = 'receipt-' + Date.now() + '.png';
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+  });
+}
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js');
+  });
+}
+</script>
+</body>
+</html>
