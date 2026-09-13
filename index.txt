@@ -96,7 +96,7 @@
   <button class="submit-btn" onclick="generateReceipt()">⚡ สร้างใบกำกับย่อ / ใบเสร็จ</button>
 </div>
 <div id="receipt">
-<div class="logo"><img src="1.png" alt="Logo"></div>
+<div class="logo"><img src="1.png": <img src="logo.png" style="width: 300px; height: auto;" alt="Logo"></div>:
   <h3>ร้านค้า &amp; บริการอาหาร</h3>
   <div class="sub">(สำนักงานใหญ่)</div>
   <div class="sub">สาขาหลัก • กรุงเทพมหานคร</div>
