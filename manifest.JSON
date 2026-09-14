@@ -2,11 +2,12 @@
   "name": "หารบิล - ใบเสร็จรับเงิน",
   "short_name": "หารบิล",
   "start_url": "./index.html",
+  "scope": "./",
   "display": "standalone",
   "background_color": "#f1f5f9",
   "theme_color": "#1e293b",
   "icons": [
-    { "src": "1.png", "sizes": "192x192", "type": "image/png" },
-    { "src": "1.png", "sizes": "512x512", "type": "image/png" }
+    { "src": "1.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "1.png", "sizes": "512x512", "type": "image/png", "purpose": "any" }
   ]
 }
