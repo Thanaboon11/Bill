@@ -6,55 +6,25 @@
 <title>หารบิล / ใบเสร็จรับเงิน</title>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#1e293b">
-<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="1.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 <style>
   * { box-sizing: border-box; }
-  body {
-    font-family: 'Sarabun', 'Segoe UI', sans-serif;
-    background: #f1f5f9;
-    margin: 0;
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-  .card {
-    background: #fff;
-    border-radius: 20px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-    max-width: 480px;
-    width: 100%;
-    padding: 24px;
-    margin-bottom: 24px;
-  }
+  body { font-family: 'Sarabun', sans-serif; background: #f1f5f9; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+  .card { background: #fff; border-radius: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); max-width: 480px; width: 100%; padding: 24px; margin-bottom: 24px; }
   h2 { text-align:center; color:#1e3a8a; }
   .row { display:flex; gap:8px; margin-bottom:10px; align-items:center; }
   .row input { flex:1; padding:10px; border:1px solid #cbd5e1; border-radius:10px; font-size:15px; }
   .row input.name { flex:2; }
   .remove-btn { background:#fee2e2; color:#dc2626; border:none; border-radius:10px; width:38px; height:38px; font-size:16px; cursor:pointer; }
-  .add-btn {
-    width:100%; padding:12px; border:2px dashed #93c5fd; background:#eff6ff;
-    color:#2563eb; border-radius:12px; font-weight:bold; cursor:pointer; margin:10px 0;
-  }
+  .add-btn { width:100%; padding:12px; border:2px dashed #93c5fd; background:#eff6ff; color:#2563eb; border-radius:12px; font-weight:bold; cursor:pointer; margin:10px 0; }
   label { font-weight:600; display:block; margin:10px 0 6px; }
   input[type=number] { width:100%; padding:10px; border:1px solid #cbd5e1; border-radius:10px; font-size:15px; }
-  .submit-btn {
-    width:100%; padding:14px; background:#2563eb; color:#fff; border:none;
-    border-radius:12px; font-size:16px; font-weight:bold; cursor:pointer; margin-top:16px;
-  }
-  .submit-btn:active { background:#1d4ed8; }
-  #receipt {
-    background:#fff; border-radius:20px; border:2px solid #dbeafe;
-    max-width:420px; width:100%; padding:30px 24px; text-align:center; display:none;
-  }
-  #receipt .logo {
-    width:70px; height:70px; background:#1e293b; border-radius:50%;
-    display:flex; align-items:center; justify-content:center; margin:0 auto 14px;
-    font-size:30px; color:#facc15;
-  }
+  .submit-btn { width:100%; padding:14px; background:#2563eb; color:#fff; border:none; border-radius:12px; font-size:16px; font-weight:bold; cursor:pointer; margin-top:16px; }
+  #receipt { background:#fff; border-radius:20px; border:2px solid #dbeafe; max-width:420px; width:100%; padding:30px 24px; text-align:center; display:none; }
+  #receipt .logo { width:100px; height:100px; margin:0 auto 14px; overflow:hidden; border-radius:50%; display:flex; align-items:center; justify-content:center; }
+  #receipt .logo img { width:100%; height:100%; object-fit:contain; }
   #receipt h3 { margin:4px 0; color:#0f172a; }
   #receipt .sub { color:#64748b; font-size:14px; margin:2px 0; }
   hr { border:none; border-top:1px solid #e2e8f0; margin:16px 0; }
@@ -67,19 +37,15 @@
   .item-row .price { font-weight:bold; }
   .total-row { display:flex; justify-content:space-between; font-size:15px; margin:6px 0; }
   .grand-total { display:flex; justify-content:space-between; font-size:20px; font-weight:bold; margin:10px 0; }
-  .split-box {
-    background:#ecfdf5; border:2px dashed #6ee7b7; border-radius:14px;
-    padding:16px; margin-top:16px; display:flex; justify-content:space-between; align-items:center;
-  }
+  .split-box { background:#ecfdf5; border:2px dashed #6ee7b7; border-radius:14px; padding:16px; margin-top:16px; display:flex; justify-content:space-between; align-items:center; }
   .split-box .label { text-align:left; font-weight:bold; color:#065f46; }
   .split-box .sub { color:#059669; font-size:12px; }
   .split-box .amount { color:#059669; font-size:26px; font-weight:bold; }
   .action-btns { display:flex; gap:10px; margin-top:16px; max-width:420px; width:100%; }
-  .action-btns button {
-    flex:1; padding:12px; border-radius:12px; border:none; font-weight:bold; cursor:pointer;
-  }
+  .action-btns button { flex:1; padding:12px; border-radius:12px; border:none; font-weight:bold; cursor:pointer; }
   #saveImgBtn { background:#0f172a; color:#fff; }
   #newBillBtn { background:#e2e8f0; color:#1e293b; }
+  #backBtn { background:#fbbf24; color:#000; }
 </style>
 </head>
 <body>
@@ -89,15 +55,14 @@
   <label>รายการที่ต้องคิดเงิน / หาร</label>
   <div id="itemsContainer"></div>
   <button class="add-btn" onclick="addItem()">+ เพิ่มรายการถัดไป</button>
-
   <label>จำนวนคนที่หาร (คน)</label>
   <input type="number" id="peopleCount" value="1" min="1">
-
   <button class="submit-btn" onclick="generateReceipt()">⚡ สร้างใบกำกับย่อ / ใบเสร็จ</button>
 </div>
-id="receipt">
-<div class="logo"><img src="1.png": <img src="logo.png" style="width: 200px; height: 200px;" alt="Logo"></div>:
-  <h3>หารบิล &amp; บริการออกใบเสร็จ</h3>
+
+<div id="receipt">
+  <div class="logo"><img src="1.png" alt="โลโก้"></div>
+  <h3>หารบิล & บริการออกใบเสร็จ</h3>
   <div class="sub">(สำนักงานใหญ่)</div>
   <div class="sub">สาขาหลัก • ที่ไหนไม่รู้</div>
   <div class="sub">โทร. 00-000-0000</div>
@@ -105,7 +70,7 @@ id="receipt">
   <div class="title">ใบกำกับภาษีอย่างย่อ/ใบเสร็จรับเงิน</div>
   <div class="code" id="billCode"></div>
   <hr style="border-style:dashed">
-  <div class="meta-row"><span>พนักงานขาย</span><span>ระบบแคชเชียร์ POS</span></div>
+  <div class="meta-row"><span>ออกโดย Thanaboon</span><span>ระบบแคชเชียร์ POS</span></div>
   <div class="meta-row"><span>วันที่</span><span id="billDate"></span></div>
   <div class="item-header"><span>รายการ</span><span>รวมเงิน</span></div>
   <div id="itemsList"></div>
@@ -123,7 +88,7 @@ id="receipt">
 </div>
 
 <div class="action-btns" id="actionBtns" style="display:none">
-  <button id="backBtn" onclick="goBack()" style="background:#fbbf24; color:#000;">⬅️ ย้อนกลับแก้ไข</button>
+  <button id="backBtn" onclick="goBack()">⬅️ ย้อนกลับแก้ไข</button>
   <button id="saveImgBtn" onclick="saveAsImage()">💾 บันทึกเป็นรูปภาพ</button>
   <button id="newBillBtn" onclick="location.reload()">🆕 บิลใหม่</button>
 </div>
@@ -131,9 +96,7 @@ id="receipt">
 <script>
 const SHEET_API_URL = "https://script.google.com/macros/s/AKfycbzBBm-upwM2lnIbqW5tIQwnkUCSLk89if_MpV6lJ_pBwL0ciagR11LPnDVdGOhFCPnD7g/exec";
 
-let itemCount = 0;
 function addItem() {
-  itemCount++;
   const container = document.getElementById('itemsContainer');
   const row = document.createElement('div');
   row.className = 'row';
@@ -160,12 +123,6 @@ function generateReceipt() {
       items.push({ name, price });
       total += price;
     }
-function goBack() {
-  document.getElementById('receipt').style.display = 'none';
-  document.getElementById('actionBtns').style.display = 'none';
-  document.getElementById('formCard').style.display = 'block';
-}
-
   }
   if (items.length === 0) { alert('กรุณาใส่รายการอย่างน้อย 1 รายการ'); return; }
 
@@ -182,12 +139,11 @@ function goBack() {
   const itemsList = document.getElementById('itemsList');
   itemsList.innerHTML = '';
   items.forEach((it, index) => {
-  const row = document.createElement('div');
-  row.className = 'item-row';
-  row.innerHTML = `<span class="name">index+1.{index+1}. index+1.{it.name}</span><span class="price">${it.price.toLocaleString('th-TH',{minimumFractionDigits:2})}</span>`;
-  itemsList.appendChild(row);
-});
-
+    const row = document.createElement('div');
+    row.className = 'item-row';
+    row.innerHTML = `<span class="name">${index+1}. ${it.name}</span><span class="price">${it.price.toLocaleString('th-TH',{minimumFractionDigits:2})}</span>`;
+    itemsList.appendChild(row);
+  });
 
   document.getElementById('totalCount').textContent = items.length;
   document.getElementById('totalSum').textContent = total.toLocaleString('th-TH',{minimumFractionDigits:2});
@@ -200,6 +156,12 @@ function goBack() {
   document.getElementById('actionBtns').style.display = 'flex';
 
   saveToSheet({ billCode, date: dateStr, items, total, people, perPerson: total/people });
+}
+
+function goBack() {
+  document.getElementById('receipt').style.display = 'none';
+  document.getElementById('actionBtns').style.display = 'none';
+  document.getElementById('formCard').style.display = 'block';
 }
 
 function saveToSheet(data) {
